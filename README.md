@@ -9,10 +9,7 @@ Automated, SEO-friendly content publishing powered by **n8n + AI**, delivered as
 ![n8n](https://img.shields.io/badge/n8n-Automation-EA4B71?logo=n8n&logoColor=white)
 ![AI](https://img.shields.io/badge/AI-Content_Generation-111827)
 
-## Demo
-
-- **Demo video / GIF**: _Coming soon_
-- **Live site**: _Coming soon_
+- **Live site**: [https://revuhub.vercel.app/](https://revuhub.vercel.app/)
 
 ## Problem & solution (why I built this)
 
