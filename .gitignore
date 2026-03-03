@@ -4,9 +4,13 @@ node_modules
 .astro/
 dist/
 
+# Tooling
+.trae/
+
 # Environment
 .env
 .env.*
+!.env.example
 
 # Logs
 npm-debug.log*
