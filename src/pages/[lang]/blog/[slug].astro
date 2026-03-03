@@ -1,0 +1,41 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ArticlePage from '../../../pages/_Article';
+import { getArticleBySlug, getArticles } from '../../../lib/api';
+import { siteConfig } from '../../../site-config';
+
+export async function getStaticPaths() {
+  const paths = [];
+  const languages = Object.keys(siteConfig.languages);
+  
+  try {
+    for (const lang of languages) {
+      const articles = await getArticles(lang);
+      if (articles && articles.length > 0) {
+        for (const article of articles) {
+          if (article.slug) {
+            paths.push({
+              params: { lang, slug: article.slug },
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error in getStaticPaths:', error);
+  }
+  
+  return paths;
+}
+
+const { lang, slug } = Astro.params;
+const article = await getArticleBySlug(slug, lang);
+
+if (!article) {
+  return Astro.redirect(`/${lang}`);
+}
+---
+
+<Layout title={article.title} description={article.excerpt} image={article.image_url} lang={lang}>
+  <ArticlePage client:load article={article} content={article.content} lang={lang} />
+</Layout>

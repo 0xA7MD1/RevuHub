@@ -1,0 +1,83 @@
+---
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { siteConfig } from '../site-config';
+import '../styles/globals.css'; // Assuming this exists or will be created, or just use minimal styles
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  lang?: string;
+}
+
+const { 
+  title, 
+  description, 
+  image, 
+  lang = siteConfig.defaultLanguage,
+} = Astro.props;
+
+const dir = siteConfig.languages[lang as keyof typeof siteConfig.languages]?.dir || 'ltr';
+const fullTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
+const fullDesc = description || siteConfig.description;
+const fullImage = image || '/og-image.jpg';
+// Build hreflang alternates and canonical from current path
+const pathname = Astro.url?.pathname || '/';
+const parts = pathname.split('/').filter(Boolean);
+const currentRest = parts.length > 0 && (parts[0] === 'en' || parts[0] === 'ar') ? parts.slice(1).join('/') : parts.join('/');
+const altEn = `/en/${currentRest}`;
+const altAr = `/ar/${currentRest}`;
+const canonicalPath = `/${siteConfig.defaultLanguage}/${currentRest}`;
+---
+
+<!DOCTYPE html>
+<html lang={lang} dir={dir} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={fullDesc} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={fullDesc} />
+    <meta property="og:image" content={fullImage} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={fullTitle} />
+    <meta property="twitter:description" content={fullDesc} />
+    <meta property="twitter:image" content={fullImage} />
+    <link rel="alternate" hrefLang="en" href={altEn} />
+    <link rel="alternate" hrefLang="ar" href={altAr} />
+    <link rel="canonical" href={canonicalPath} />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style is:global>
+      :root {
+        --font-cairo: 'Cairo', sans-serif;
+        --font-inter: 'Inter', sans-serif;
+      }
+      body {
+        font-family: var(--font-inter);
+      }
+      html[lang="ar"] body {
+        font-family: var(--font-cairo);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white">
+    <Header lang={lang} client:load />
+    <div class="flex-grow">
+      <slot />
+    </div>
+    <Footer lang={lang} client:visible />
+  </body>
+</html>

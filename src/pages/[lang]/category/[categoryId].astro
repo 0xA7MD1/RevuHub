@@ -1,0 +1,33 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CategoryPage from '../../../pages/_Category';
+import { getArticlesByCategory } from '../../../lib/api';
+import { siteConfig } from '../../../site-config';
+
+export async function getStaticPaths() {
+  const paths = [];
+  const languages = Object.keys(siteConfig.languages);
+  const categories = siteConfig.categories;
+  
+  for (const lang of languages) {
+    for (const cat of categories) {
+      paths.push({
+        params: { lang, categoryId: cat.id },
+      });
+    }
+  }
+  return paths;
+}
+
+const { lang, categoryId } = Astro.params;
+const articles = await getArticlesByCategory(categoryId, lang);
+const category = siteConfig.categories.find(c => c.id === categoryId);
+
+if (!category) {
+  return Astro.redirect(`/${lang}`);
+}
+---
+
+<Layout title={category[lang as 'en'|'ar']} lang={lang}>
+  <CategoryPage client:load articles={articles} categoryId={categoryId} lang={lang} />
+</Layout>

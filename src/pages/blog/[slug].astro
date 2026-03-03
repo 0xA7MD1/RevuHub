@@ -1,0 +1,118 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { supabase } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  try {
+    const { data: articles } = await supabase
+      .from('articles')
+      .select('slug_en');
+
+    return articles?.filter(article => article.slug_en).map(({ slug_en }) => ({
+      params: { slug: slug_en },
+    })) || [];
+  } catch (error) {
+    console.error('Error in getStaticPaths:', error);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+
+const { data: article, error } = await supabase
+  .from('articles')
+  .select('*')
+  .eq('slug_en', slug)
+  .single();
+
+if (error || !article) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={article.seo_title_en || article.title_en} description={article.meta_description_en || article.excerpt_en || ''}>
+  <article class="max-w-4xl mx-auto px-4 py-12">
+    <header class="mb-12 text-center article-header opacity-0 translate-y-4">
+      {article.category_en && (
+        <span class="inline-block px-3 py-1 mb-4 text-sm font-semibold tracking-wider text-blue-600 uppercase bg-blue-50 rounded-full">
+          {article.category_en}
+        </span>
+      )}
+      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">
+        {article.title_en}
+      </h1>
+      <div class="flex items-center justify-center space-x-4 text-slate-500 text-sm">
+        <time datetime={article.published_at}>
+          {article.published_at ? new Date(article.published_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }) : ''}
+        </time>
+        <span>•</span>
+        <span>{Math.ceil((article.content_en || '').length / 500)} min read</span>
+      </div>
+    </header>
+
+    {article.image_url && (
+      <div class="mb-12 rounded-xl overflow-hidden shadow-xl article-image opacity-0 scale-95">
+        <img 
+          src={article.image_url} 
+          alt={article.image_alt_text_en || article.title_en}
+          class="w-full h-auto object-cover max-h-[500px]"
+        />
+      </div>
+    )}
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-8">
+        <div 
+          class="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-800 article-content opacity-0"
+        >
+          {article.content_en}
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <script>
+    import { gsap } from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Header animation
+    gsap.to('.article-header', {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'power3.out'
+    });
+
+    // Image animation
+    gsap.to('.article-image', {
+      opacity: 1,
+      scale: 1,
+      duration: 1.2,
+      delay: 0.2,
+      ease: 'expo.out'
+    });
+
+    // Content fade in
+    gsap.to('.article-content', {
+      opacity: 1,
+      duration: 1,
+      delay: 0.4,
+      ease: 'power2.out'
+    });
+
+    // Sidebar sticky animation
+    gsap.to('.affiliate-box', {
+      opacity: 1,
+      x: 0,
+      duration: 0.8,
+      delay: 0.6,
+      ease: 'back.out(1.7)'
+    });
+  </script>
+</Layout>

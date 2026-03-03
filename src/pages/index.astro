@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { siteConfig } from '../site-config';
+const languages = Object.entries(siteConfig.languages);
+const defaultLang = siteConfig.defaultLanguage;
+
+// Import translations
+const translations = {
+  en: {
+    welcome: "Welcome",
+    choose_language: "Choose your language to continue"
+  },
+  ar: {
+    welcome: "مرحباً", 
+    choose_language: "اختر لغتك للمتابعة"
+  }
+};
+---
+
+<Layout title="Welcome" lang={defaultLang}>
+  <main class="max-w-7xl mx-auto px-6 py-24">
+    <section class="text-center mb-12">
+      <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter mb-4">
+        {siteConfig.enName}
+      </h1>
+      <p class="text-slate-500 text-lg font-medium">
+        {translations[defaultLang].choose_language}
+      </p>
+    </section>
+
+    <div class="flex items-center justify-center gap-6">
+      {languages.map(([code, cfg]) => (
+        <a 
+          href={`/${code}`} 
+          class="inline-flex items-center gap-2 px-6 py-4 rounded-2xl border border-slate-200 hover:border-emerald-500 bg-white text-slate-900 hover:text-emerald-600 transition-all shadow-sm font-black"
+        >
+          <span class="text-sm uppercase tracking-[0.2em]">{cfg.label}</span>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>

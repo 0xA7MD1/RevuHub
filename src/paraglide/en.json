@@ -1,0 +1,20 @@
+{
+  "welcome": {
+    "title": "Welcome",
+    "choose_language": "Choose your language to continue"
+  },
+  "navigation": {
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "common": {
+    "read_more": "Read More",
+    "published_on": "Published on",
+    "category": "Category",
+    "tags": "Tags",
+    "search": "Search",
+    "language": "Language"
+  }
+}

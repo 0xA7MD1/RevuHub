@@ -1,0 +1,20 @@
+{
+  "welcome": {
+    "title": "مرحباً",
+    "choose_language": "اختر لغتك للمتابعة"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "blog": "المدونة",
+    "about": "من نحن",
+    "contact": "اتصل بنا"
+  },
+  "common": {
+    "read_more": "اقرأ المزيد",
+    "published_on": "نشر في",
+    "category": "الفئة",
+    "tags": "الوسوم",
+    "search": "بحث",
+    "language": "اللغة"
+  }
+}

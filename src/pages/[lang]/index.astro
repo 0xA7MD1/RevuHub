@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Home from '../../pages/_Home';
+import { getArticles } from '../../lib/api';
+import { siteConfig } from '../../site-config';
+
+export async function getStaticPaths() {
+  return Object.keys(siteConfig.languages).map(lang => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params;
+const articles = await getArticles(lang);
+---
+
+<Layout title="Home" lang={lang}>
+  <Home client:load articles={articles} lang={lang} />
+</Layout>
