@@ -1,22 +1,37 @@
-import { supabase } from '../lib/supabase';
-import type { Database } from '../types/database';
-
-type ArticleSitemapRow = Pick<Database['public']['Tables']['articles']['Row'], 'slug_en' | 'updated_at'>;
+import { getArticles } from '../lib/api';
 
 export async function GET({ site }: { site: URL }) {
-  const { data: articles } = (await supabase
-    .from('articles')
-    .select('slug_en, updated_at')) as { data: ArticleSitemapRow[] | null };
+  const base = site ? site.href : 'https://example.com/';
+  const enArticles = await getArticles('en');
+  const arArticles = await getArticles('ar');
 
   const pages = [
     {
-      url: site ? site.href : 'https://example.com/',
+      url: base,
       lastmod: new Date().toISOString(),
       changefreq: 'daily',
       priority: 1.0,
     },
-    ...(articles?.map((article) => ({
-      url: `${site ? site.href : 'https://example.com/'}blog/${article.slug_en}`,
+    {
+      url: `${base}en/`,
+      lastmod: new Date().toISOString(),
+      changefreq: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${base}ar/`,
+      lastmod: new Date().toISOString(),
+      changefreq: 'daily',
+      priority: 0.9,
+    },
+    ...(enArticles?.map((article) => ({
+      url: `${base}en/blog/${article.slug}`,
+      lastmod: new Date(article.updated_at || new Date().toISOString()).toISOString(),
+      changefreq: 'weekly',
+      priority: 0.8,
+    })) || []),
+    ...(arArticles?.map((article) => ({
+      url: `${base}ar/blog/${article.slug}`,
       lastmod: new Date(article.updated_at || new Date().toISOString()).toISOString(),
       changefreq: 'weekly',
       priority: 0.8,
