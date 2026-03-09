@@ -8,9 +8,14 @@ export const siteConfig = {
     ar: { label: 'العربية', dir: 'rtl' },
   },
   categories: [
-    { id: 'tech', en: 'Technology', ar: 'تكنولوجيا' },
-    { id: 'health', en: 'Health', ar: 'صحة' },
-    { id: 'business', en: 'Business', ar: 'أعمال' },
+    { id: "cybersecurity", en: "Cybersecurity", ar: "الأمن السيبراني" },
+    { id: "ai-machine-learning", en: "AI & Machine Learning", ar: "الذكاء الاصطناعي وتعلم الآلة" },
+    { id: "software-engineering", en: "Software Engineering", ar: "هندسة البرمجيات" },
+    { id: "devops-cloud", en: "DevOps & Cloud", ar: "DevOps والحوسبة السحابية" },
+    { id: "web-development", en: "Web Development", ar: "تطوير الويب" },
+    { id: "data-engineering", en: "Data Engineering", ar: "هندسة البيانات" },
+    { id: "blockchain-web3", en: "Blockchain & Web3", ar: "البلوك تشين والويب 3" },
+    { id: "mobile-development", en: "Mobile Development", ar: "تطوير تطبيقات الجوال" }
   ],
   i18n: {
     en: {
@@ -23,6 +28,8 @@ export const siteConfig = {
       loading: 'Loading...',
       heroTitle: 'Future..Tech Reviews',
       heroSubtitle: 'Discover in-depth reviews, expert analysis, and the latest trends in technology. Your guide to smarter buying decisions.',
+      footerAbout: 'Your trusted source for tech reviews and buying guides.',
+      copyright: 'All rights reserved',
     },
     ar: {
       searchPlaceholder: 'ابحث عن المقالات...',
@@ -34,6 +41,16 @@ export const siteConfig = {
       loading: 'جاري التحميل...',
       heroTitle: 'مراجعات..تقنية المستقبل',
       heroSubtitle: 'اكتشف مراجعات متعمقة، تحليلات الخبراء، وأحدث اتجاهات التكنولوجيا. دليلك لقرارات شراء أذكى.',
+      footerAbout: 'مصدرك الموثوق لمراجعات التقنية وأدلة الشراء.',
+      copyright: 'جميع الحقوق محفوظة',
     },
+  },
+  footerLinks: {
+    social: [
+      { name: 'Twitter', url: 'https://twitter.com', icon: 'Twitter' },
+      { name: 'TikTok', url: 'https://tiktok.com', icon: 'Instagram' },
+      { name: 'LinkedIn', url: 'https://linkedin.com', icon: 'Linkedin' },
+      { name: 'GitHub', url: 'https://github.com', icon: 'Github' },
+    ],
   },
 };

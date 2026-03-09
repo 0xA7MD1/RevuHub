@@ -1,6 +1,5 @@
 import React from 'react';
-import { Badge } from './Badge';
-import { Quote, Lightbulb, TrendingUp, Eye, Heart } from 'lucide-react';
+import { Quote, Lightbulb, TrendingUp } from 'lucide-react';
 
 interface EnhancedContentProps {
   article: any;
@@ -12,22 +11,7 @@ const EnhancedContent: React.FC<EnhancedContentProps> = ({ article, lang = 'en' 
 
   const t = {
     featuredQuote: isRtl ? 'اقتباس مميز' : 'Featured Quote',
-    keyTakeaways: isRtl ? 'النقاط الرئيسية' : 'Key Takeaways',
-    difficulty: isRtl ? 'مستوى الصعوبة' : 'Difficulty',
-    views: isRtl ? 'مشاهدة' : 'Views',
-    likes: isRtl ? 'إعجاب' : 'Likes',
-    beginner: isRtl ? 'مبتدئ' : 'Beginner',
-    intermediate: isRtl ? 'متوسط' : 'Intermediate',
-    advanced: isRtl ? 'متقدم' : 'Advanced'
-  };
-
-  const getDifficultyColor = (level: string) => {
-    switch (level) {
-      case 'beginner': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-      case 'intermediate': return 'bg-amber-100 text-amber-700 border-amber-200';
-      case 'advanced': return 'bg-rose-100 text-rose-700 border-rose-200';
-      default: return 'bg-slate-100 text-slate-700 border-slate-200';
-    }
+    keyTakeaways: isRtl ? 'النقاط الرئيسية' : 'Key Takeaways'
   };
 
   return (
@@ -52,44 +36,7 @@ const EnhancedContent: React.FC<EnhancedContentProps> = ({ article, lang = 'en' 
         </div>
       )}
 
-      {/* Article Meta Enhanced */}
-      <div className="my-12 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
-        <div className="flex flex-wrap items-center gap-6">
-          {article.difficulty_level && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-500">{t.difficulty}:</span>
-              <Badge className={getDifficultyColor(article.difficulty_level)}>
-                {t[article.difficulty_level as keyof typeof t] || article.difficulty_level}
-              </Badge>
-            </div>
-          )}
-          
-          <div className="flex items-center gap-4 text-sm text-slate-600">
-            <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              <span className="font-medium">{article.view_count || 0}</span>
-              <span>{t.views}</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-rose-500" />
-              <span className="font-medium">{article.like_count || 0}</span>
-              <span>{t.likes}</span>
-            </div>
-          </div>
-
-          {article.tags && article.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {article.tags.map((tag: string, idx: number) => (
-                <Badge key={idx} variant="outline" className="text-xs">
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
+      
       {/* Key Takeaways */}
       {article.key_takeaways && article.key_takeaways.length > 0 && (
         <div className="my-16 p-8 bg-gradient-to-br from-slate-50 to-slate-100 rounded-[3rem] border border-slate-200">

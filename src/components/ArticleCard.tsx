@@ -3,6 +3,7 @@ import { Article } from '../types';
 import { ArrowRight, Clock, Calendar, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { siteConfig } from '../site-config';
+import { getTimeAgo } from '../lib/timeAgo';
 
 interface ArticleCardProps {
   article: Article;
@@ -49,7 +50,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, lang = 'en' }) => {
           <div className="w-1 h-1 rounded-full bg-slate-200" />
           <div className="flex items-center gap-2">
             <Clock className="w-3.5 h-3.5 text-emerald-500" />
-            {article.reading_time || 5} min
+            {publishDate ? getTimeAgo(publishDate, currentLang) : ''}
           </div>
         </div>
         

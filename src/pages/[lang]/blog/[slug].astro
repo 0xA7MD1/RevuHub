@@ -1,41 +1,80 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import ArticlePage from '../../../pages/_Article';
-import { getArticleBySlug, getArticles } from '../../../lib/api';
+import { getArticleBySlug, getArticleByAnySlug } from '../../../lib/api';
 import { siteConfig } from '../../../site-config';
+import { supabase } from '../../../lib/supabase';
+import { MOCK_ARTICLES } from '../../../lib/mock-data';
 
-export async function getStaticPaths() {
-  const paths = [];
-  const languages = Object.keys(siteConfig.languages);
-  
-  try {
-    for (const lang of languages) {
-      const articles = await getArticles(lang);
-      if (articles && articles.length > 0) {
-        for (const article of articles) {
-          if (article.slug) {
-            paths.push({
-              params: { lang, slug: article.slug },
-            });
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Error in getStaticPaths:', error);
-  }
-  
-  return paths;
-}
+export const prerender = false;
 
 const { lang, slug } = Astro.params;
-const article = await getArticleBySlug(slug, lang);
+
+// Validate that lang is a valid language code
+const validLanguages = Object.keys(siteConfig.languages);
+if (!validLanguages.includes(lang as string)) {
+  return Astro.redirect('/404');
+}
+
+// First try to get the article by slug in the requested language
+let article = await getArticleBySlug(slug as string, lang as string);
+
+// If not found, try to find it by any slug and get the correct slug for this language
+if (!article) {
+  const { article: foundArticle, foundLang } = await getArticleByAnySlug(slug as string, lang as string);
+  if (foundArticle) {
+    // Redirect to the correct slug for this language
+    return Astro.redirect(`/${lang}/blog/${foundArticle.slug}`);
+  }
+}
 
 if (!article) {
   return Astro.redirect(`/${lang}`);
 }
+
+// Get the article in the other language to create slug mapping
+const otherLang = lang === 'ar' ? 'en' : 'ar';
+
+// For mock data, find equivalent article by ID
+let otherLangArticle = null;
+if (!supabase) {
+  // Find the current article in mock data
+  const currentMockArticle = MOCK_ARTICLES.find(a => a.slug === slug && a.lang === lang);
+  if (currentMockArticle) {
+    // Find equivalent article in other language by ID
+    otherLangArticle = MOCK_ARTICLES.find(a => a.id === currentMockArticle.id && a.lang === otherLang);
+  }
+} else {
+  // For Supabase, use the existing function
+  const result = await getArticleByAnySlug(slug as string, otherLang);
+  otherLangArticle = result.article;
+}
+
+// Create slug mapping for language switching
+const slugMapping = {
+  // Map current slug to the other language slug
+  [slug as string]: otherLangArticle?.slug || null,
+  // Map other language slug back to current slug
+  ...(otherLangArticle && { [otherLangArticle.slug]: slug as string })
+};
+
+// Debug logging
+console.log('Current lang:', lang);
+console.log('Current slug:', slug);
+console.log('Other lang:', otherLang);
+console.log('Other lang article:', otherLangArticle);
+console.log('Slug mapping:', slugMapping);
 ---
 
+<script define:vars={{ slugMapping }}>
+  // Make slug mapping available to client components
+  console.log('Setting slug mapping on client:', slugMapping);
+  window.slugMapping = slugMapping;
+  
+  // Also dispatch a custom event to notify components
+  window.dispatchEvent(new CustomEvent('slugMappingReady', { detail: slugMapping }));
+</script>
+
 <Layout title={article.title} description={article.excerpt} image={article.image_url} lang={lang}>
-  <ArticlePage client:load article={article} content={article.content} lang={lang} />
+  <ArticlePage client:load article={article} content={article.content} lang={lang} slugMapping={slugMapping} />
 </Layout>

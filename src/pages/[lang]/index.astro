@@ -11,6 +11,13 @@ export async function getStaticPaths() {
 }
 
 const { lang } = Astro.params;
+
+// Validate that lang is a valid language code
+const validLanguages = Object.keys(siteConfig.languages);
+if (!validLanguages.includes(lang)) {
+  return Astro.redirect('/404');
+}
+
 const articles = await getArticles(lang);
 ---
 

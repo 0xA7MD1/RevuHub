@@ -11,14 +11,16 @@ import {
 } from 'lucide-react';
 import { siteConfig } from '../site-config';
 import { cn } from '../lib/utils';
+import { getTimeAgo } from '../lib/timeAgo';
 
 interface ArticleProps {
   article: ArticleType;
   content: string; // Changed from htmlContent to content (markdown string)
   lang?: string;
+  slugMapping?: Record<string, string>;
 }
 
-const Article: React.FC<ArticleProps> = ({ article, content, lang = 'en' }) => {
+const Article: React.FC<ArticleProps> = ({ article, content, lang = 'en', slugMapping }) => {
   const currentLang = (lang || siteConfig.defaultLanguage) as 'en' | 'ar';
   const isRtl = currentLang === 'ar';
 
@@ -55,6 +57,15 @@ const Article: React.FC<ArticleProps> = ({ article, content, lang = 'en' }) => {
         });
     }
   }, [content]);
+
+  // Set slug mapping for language switcher
+  useEffect(() => {
+    console.log('Article component - slugMapping prop:', slugMapping);
+    if (slugMapping && typeof window !== 'undefined') {
+      console.log('Setting slug mapping in Article component:', slugMapping);
+      window.slugMapping = slugMapping;
+    }
+  }, [slugMapping]);
 
   useEffect(() => {
     if (!toc || toc.length === 0) return;
@@ -119,7 +130,7 @@ const Article: React.FC<ArticleProps> = ({ article, content, lang = 'en' }) => {
             <div className="flex flex-wrap items-center gap-4 mb-4">
               <Badge variant="success">{article.category}</Badge>
               <span className="text-white/80 text-sm font-bold flex items-center gap-1.5">
-                <Clock className="w-4 h-4" /> {article.reading_time || 7} {isRtl ? 'دقائق' : 'mins'}
+                <Clock className="w-4 h-4" /> {publishDate ? getTimeAgo(publishDate, currentLang) : ''}
               </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight mb-8">
@@ -240,14 +251,6 @@ const Article: React.FC<ArticleProps> = ({ article, content, lang = 'en' }) => {
                   </div>
                 </div>
 
-                {/* Social Sharing */}
-                <div className="flex justify-center gap-4">
-                  {['Twitter', 'Facebook', 'LinkedIn'].map((i) => (
-                    <Button key={i} variant="outline" size="icon" className="w-14 h-14 rounded-2xl hover:border-emerald-500 hover:text-emerald-600 shadow-sm">
-                      <Share2 className="w-5 h-5" />
-                    </Button>
-                  ))}
-                </div>
               </div>
             </aside>
           </div>

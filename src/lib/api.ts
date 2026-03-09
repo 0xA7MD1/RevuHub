@@ -108,3 +108,63 @@ export const getArticleBySlug = async (slug: string, lang: string = 'en'): Promi
     return MOCK_ARTICLES.find(a => a.slug === slug && a.lang === lang) || null;
   }
 };
+
+export const getArticleByAnySlug = async (slug: string, targetLang: string = 'en'): Promise<{ article: Article | null, foundLang: string | null }> => {
+  if (!supabase) {
+    // For mock data, find the article by slug and then find its equivalent in the target language
+    const article = MOCK_ARTICLES.find(a => a.slug === slug);
+    if (article) {
+      // Find the equivalent article in the target language by ID
+      const equivalentArticle = MOCK_ARTICLES.find(a => a.id === article.id && a.lang === targetLang);
+      if (equivalentArticle) {
+        return { article: equivalentArticle, foundLang: targetLang };
+      }
+      return { article, foundLang: article.lang || null };
+    }
+    return { article: null, foundLang: null };
+  }
+
+  try {
+    const normalizedLang = normalizeLang(targetLang);
+    
+    // First try to find by slug in target language
+    const slugColumn = normalizedLang === 'ar' ? 'slug_ar' : 'slug_en';
+    const { data, error } = await supabase
+      .from('articles')
+      .select('*')
+      .eq(slugColumn as any, slug)
+      .single();
+
+    if (data && !error) {
+      return { article: mapArticleRow(data, normalizedLang), foundLang: normalizedLang };
+    }
+
+    // If not found, try the other language slug
+    const otherLang = normalizedLang === 'ar' ? 'en' : 'ar';
+    const otherSlugColumn = otherLang === 'ar' ? 'slug_ar' : 'slug_en';
+    const { data: otherData, error: otherError } = await supabase
+      .from('articles')
+      .select('*')
+      .eq(otherSlugColumn as any, slug)
+      .single();
+
+    if (otherData && !otherError) {
+      // Found the article, but return it in the target language
+      return { article: mapArticleRow(otherData, normalizedLang), foundLang: otherLang };
+    }
+
+    return { article: null, foundLang: null };
+  } catch (err) {
+    console.error('Error fetching article by any slug:', err);
+    const article = MOCK_ARTICLES.find(a => a.slug === slug);
+    if (article) {
+      // Find the equivalent article in the target language by ID
+      const equivalentArticle = MOCK_ARTICLES.find(a => a.id === article.id && a.lang === targetLang);
+      if (equivalentArticle) {
+        return { article: equivalentArticle, foundLang: targetLang };
+      }
+      return { article, foundLang: article.lang || null };
+    }
+    return { article: null, foundLang: null };
+  }
+};
